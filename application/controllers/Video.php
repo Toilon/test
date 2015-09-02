@@ -38,15 +38,15 @@ class Video extends REST_Controller
        $uploaded_file = array_shift($_FILES);
        $this->amqp->push('video', [
                 "video_id"=>$video_id,
-               "start_time"=>"01:00",
-               "end_time"=>"01:33",
+               "start_time"=>$this->input->post("start"),
+               "end_time"=>$this->input->post("end"),
                "type"=>$uploaded_file['type'],
                "content"=>base64_encode(file_get_contents($uploaded_file['tmp_name']))
            ]);
 
         $collection = $this->mongo_db->db->selectCollection('video');
         $user_data=array('user'=>$headers['X_API_KEY']
-                        ,'status'=>"scheduled");
+                        ,'status'=>"scheduled", "video_id"=>$video_id);
         $collection->save($user_data);
 
         $this->response([
